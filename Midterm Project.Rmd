@@ -53,6 +53,7 @@ season_df =
     names_from = stat,
     values_from = count
   ) %>% 
+  mutate(TeamID = as.factor(TeamID)) %>% 
   unnest()
 ```
 
@@ -96,4 +97,29 @@ season_df %>%
   geom_boxplot()
 ```
 
+```{r}
+total_games_df = 
+  season_df %>% 
+  group_by(Season, TeamID) %>% 
+  summarize(n_games = n())
+
+win_pct_df = 
+  season_df %>% 
+  group_by(Season, TeamID) %>% 
+  filter(outcome == "win") %>% 
+  summarize(n_wins = n()) %>% 
+  left_join(total_games_df) %>% 
+  mutate(win_pct = n_wins/n_games)
+
+stats_pct_df = 
+  season_df %>% 
+  group_by(Season, TeamID) %>% 
+  summarize(fg_pct = mean(FGM/FGA), 
+            fg3_pct = mean(FGM3/FGA3), 
+            ft_pct = mean(FTM/FTA))
+
+#stats_df = 
+  #season_df %>% group_by(Season, TeamID) %>% 
+  #map(.x = OR:PF, ~summarize(mean = mean(.x)))
+```
 
